@@ -68,7 +68,7 @@ export default function Dropzone() {
         transition-all duration-300 ease-in-out
         flex flex-col items-center justify-center gap-6 cursor-pointer
         backdrop-blur-xl bg-white/5
-        ${isDragActive ? 'border-indigo-500 bg-indigo-500/10 scale-105 shadow-[0_0_40px_rgba(99,102,241,0.2)]' : 'border-white/20 hover:border-white/40 hover:bg-white/10'}
+        ${isDragActive ? 'border-amber-500 bg-amber-500/10 scale-105 shadow-[0_0_40px_rgba(245,158,11,0.2)]' : 'border-white/20 hover:border-amber-500/40 hover:bg-white/10'}
         ${isProcessing ? 'animate-pulse' : ''}
       `}
     >
@@ -78,9 +78,9 @@ export default function Dropzone() {
         {isDone ? (
           <CheckCircle className="w-12 h-12 text-emerald-400" />
         ) : isDragActive ? (
-          <UploadCloud className="w-12 h-12 text-indigo-400" />
+          <UploadCloud className="w-12 h-12 text-amber-400" />
         ) : (
-          <FileJson className="w-12 h-12 text-gray-300" />
+          <FileJson className="w-12 h-12 text-gray-300 group-hover:text-amber-300 transition-colors" />
         )}
       </div>
 
@@ -98,7 +98,7 @@ export default function Dropzone() {
       </div>
 
       {/* Decorative gradient orb */}
-      <div className="absolute -z-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute -z-10 w-64 h-64 bg-red-600/20 rounded-full blur-[80px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
     </div>
   );
 }
