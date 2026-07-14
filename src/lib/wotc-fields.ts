@@ -1,0 +1,238 @@
+/**
+ * Field-name maps for the WotC form-fillable 5e character sheet template,
+ * which D&D Beyond uses for its "Export to PDF" feature.
+ *
+ * Names were extracted from the official templates
+ * (media.wizards.com 2016 + 2022 releases — both use identical field names).
+ * Several fields contain trailing/doubled spaces in the source PDF; all
+ * lookups happen against whitespace-normalized names (see pdf-extractor.ts).
+ *
+ * The anonymous "Check Box NN" fields were identified by matching widget
+ * rectangle coordinates against their adjacent labeled text fields.
+ */
+
+export interface SkillFieldDef {
+  /** Normalized text-field name in the PDF (skill bonus, e.g. "+5"). */
+  pdfField: string;
+  /** Normalized checkbox name marking proficiency. */
+  pdfProfBox: string;
+  /** Attribute prefix on the "D&D 5th Edition by Roll20" sheet. */
+  roll20: string;
+}
+
+export const ABILITIES = [
+  { key: 'strength', scoreField: 'STR', modField: 'STRmod' },
+  { key: 'dexterity', scoreField: 'DEX', modField: 'DEXmod' },
+  { key: 'constitution', scoreField: 'CON', modField: 'CONmod' },
+  { key: 'intelligence', scoreField: 'INT', modField: 'INTmod' },
+  { key: 'wisdom', scoreField: 'WIS', modField: 'WISmod' },
+  { key: 'charisma', scoreField: 'CHA', modField: 'CHamod' },
+] as const;
+
+export type AbilityKey = (typeof ABILITIES)[number]['key'];
+
+export const SAVES: Record<AbilityKey, { pdfField: string; pdfProfBox: string }> = {
+  strength: { pdfField: 'ST Strength', pdfProfBox: 'Check Box 11' },
+  dexterity: { pdfField: 'ST Dexterity', pdfProfBox: 'Check Box 18' },
+  constitution: { pdfField: 'ST Constitution', pdfProfBox: 'Check Box 19' },
+  intelligence: { pdfField: 'ST Intelligence', pdfProfBox: 'Check Box 20' },
+  wisdom: { pdfField: 'ST Wisdom', pdfProfBox: 'Check Box 21' },
+  charisma: { pdfField: 'ST Charisma', pdfProfBox: 'Check Box 22' },
+};
+
+export const SKILLS: SkillFieldDef[] = [
+  { pdfField: 'Acrobatics', pdfProfBox: 'Check Box 23', roll20: 'acrobatics' },
+  { pdfField: 'Animal', pdfProfBox: 'Check Box 24', roll20: 'animal_handling' },
+  { pdfField: 'Arcana', pdfProfBox: 'Check Box 25', roll20: 'arcana' },
+  { pdfField: 'Athletics', pdfProfBox: 'Check Box 26', roll20: 'athletics' },
+  { pdfField: 'Deception', pdfProfBox: 'Check Box 27', roll20: 'deception' },
+  { pdfField: 'History', pdfProfBox: 'Check Box 28', roll20: 'history' },
+  { pdfField: 'Insight', pdfProfBox: 'Check Box 29', roll20: 'insight' },
+  { pdfField: 'Intimidation', pdfProfBox: 'Check Box 30', roll20: 'intimidation' },
+  { pdfField: 'Investigation', pdfProfBox: 'Check Box 31', roll20: 'investigation' },
+  { pdfField: 'Medicine', pdfProfBox: 'Check Box 32', roll20: 'medicine' },
+  { pdfField: 'Nature', pdfProfBox: 'Check Box 33', roll20: 'nature' },
+  { pdfField: 'Perception', pdfProfBox: 'Check Box 34', roll20: 'perception' },
+  { pdfField: 'Performance', pdfProfBox: 'Check Box 35', roll20: 'performance' },
+  { pdfField: 'Persuasion', pdfProfBox: 'Check Box 36', roll20: 'persuasion' },
+  { pdfField: 'Religion', pdfProfBox: 'Check Box 37', roll20: 'religion' },
+  { pdfField: 'SleightofHand', pdfProfBox: 'Check Box 38', roll20: 'sleight_of_hand' },
+  { pdfField: 'Stealth', pdfProfBox: 'Check Box 39', roll20: 'stealth' },
+  { pdfField: 'Survival', pdfProfBox: 'Check Box 40', roll20: 'survival' },
+];
+
+export const DEATH_SAVE_BOXES = {
+  successes: ['Check Box 12', 'Check Box 13', 'Check Box 14'],
+  failures: ['Check Box 15', 'Check Box 16', 'Check Box 17'],
+};
+
+export const WEAPON_ROWS = [
+  { name: 'Wpn Name', atkBonus: 'Wpn1 AtkBonus', damage: 'Wpn1 Damage' },
+  { name: 'Wpn Name 2', atkBonus: 'Wpn2 AtkBonus', damage: 'Wpn2 Damage' },
+  { name: 'Wpn Name 3', atkBonus: 'Wpn3 AtkBonus', damage: 'Wpn3 Damage' },
+];
+
+export interface SpellLevelDef {
+  /** "cantrip" or "1".."9" — matches Roll20 repeating_spell-{level}. */
+  level: string;
+  slotsTotalField?: string;
+  slotsRemainingField?: string;
+  /** Spell-name text fields in top-to-bottom sheet order. */
+  nameFields: string[];
+}
+
+/**
+ * Page-3 spell list layout, reconstructed from widget coordinates.
+ * Each entry lists the "Spells NNNN" fields belonging to that level's block.
+ */
+export const SPELL_LEVELS: SpellLevelDef[] = [
+  {
+    level: 'cantrip',
+    nameFields: ['Spells 1014', 'Spells 1016', 'Spells 1017', 'Spells 1018', 'Spells 1019', 'Spells 1020', 'Spells 1021', 'Spells 1022'],
+  },
+  {
+    level: '1',
+    slotsTotalField: 'SlotsTotal 19',
+    slotsRemainingField: 'SlotsRemaining 19',
+    nameFields: ['Spells 1015', 'Spells 1023', 'Spells 1024', 'Spells 1025', 'Spells 1026', 'Spells 1027', 'Spells 1028', 'Spells 1029', 'Spells 1030', 'Spells 1031', 'Spells 1032', 'Spells 1033'],
+  },
+  {
+    level: '2',
+    slotsTotalField: 'SlotsTotal 20',
+    slotsRemainingField: 'SlotsRemaining 20',
+    nameFields: ['Spells 1046', 'Spells 1034', 'Spells 1035', 'Spells 1036', 'Spells 1037', 'Spells 1038', 'Spells 1039', 'Spells 1040', 'Spells 1041', 'Spells 1042', 'Spells 1043', 'Spells 1044', 'Spells 1045'],
+  },
+  {
+    level: '3',
+    slotsTotalField: 'SlotsTotal 21',
+    slotsRemainingField: 'SlotsRemaining 21',
+    nameFields: ['Spells 1048', 'Spells 1047', 'Spells 1049', 'Spells 1050', 'Spells 1051', 'Spells 1052', 'Spells 1053', 'Spells 1054', 'Spells 1055', 'Spells 1056', 'Spells 1057', 'Spells 1058', 'Spells 1059'],
+  },
+  {
+    level: '4',
+    slotsTotalField: 'SlotsTotal 22',
+    slotsRemainingField: 'SlotsRemaining 22',
+    nameFields: ['Spells 1061', 'Spells 1060', 'Spells 1062', 'Spells 1063', 'Spells 1064', 'Spells 1065', 'Spells 1066', 'Spells 1067', 'Spells 1068', 'Spells 1069', 'Spells 1070', 'Spells 1071', 'Spells 1072'],
+  },
+  {
+    level: '5',
+    slotsTotalField: 'SlotsTotal 23',
+    slotsRemainingField: 'SlotsRemaining 23',
+    nameFields: ['Spells 1074', 'Spells 1073', 'Spells 1075', 'Spells 1076', 'Spells 1077', 'Spells 1078', 'Spells 1079', 'Spells 1080', 'Spells 1081'],
+  },
+  {
+    level: '6',
+    slotsTotalField: 'SlotsTotal 24',
+    slotsRemainingField: 'SlotsRemaining 24',
+    nameFields: ['Spells 1083', 'Spells 1082', 'Spells 1084', 'Spells 1085', 'Spells 1086', 'Spells 1087', 'Spells 1088', 'Spells 1089', 'Spells 1090'],
+  },
+  {
+    level: '7',
+    slotsTotalField: 'SlotsTotal 25',
+    slotsRemainingField: 'SlotsRemaining 25',
+    nameFields: ['Spells 1092', 'Spells 1091', 'Spells 1093', 'Spells 1094', 'Spells 1095', 'Spells 1096', 'Spells 1097', 'Spells 1098', 'Spells 1099'],
+  },
+  {
+    level: '8',
+    slotsTotalField: 'SlotsTotal 26',
+    slotsRemainingField: 'SlotsRemaining 26',
+    nameFields: ['Spells 10101', 'Spells 10100', 'Spells 10102', 'Spells 10103', 'Spells 10104', 'Spells 10105', 'Spells 10106'],
+  },
+  {
+    level: '9',
+    slotsTotalField: 'SlotsTotal 27',
+    slotsRemainingField: 'SlotsRemaining 27',
+    nameFields: ['Spells 10108', 'Spells 10107', 'Spells 10109', 'Spells 101010', 'Spells 101011', 'Spells 101012', 'Spells 101013'],
+  },
+];
+
+/** "Spells NNNN" text field → its "prepared" checkbox (cantrips have none). */
+export const SPELL_PREPARED_BOXES: Record<string, string> = {
+  'Spells 1015': 'Check Box 251',
+  'Spells 1023': 'Check Box 309', 'Spells 1024': 'Check Box 3010', 'Spells 1025': 'Check Box 3011',
+  'Spells 1026': 'Check Box 3012', 'Spells 1027': 'Check Box 3013', 'Spells 1028': 'Check Box 3014',
+  'Spells 1029': 'Check Box 3015', 'Spells 1030': 'Check Box 3016', 'Spells 1031': 'Check Box 3017',
+  'Spells 1032': 'Check Box 3018', 'Spells 1033': 'Check Box 3019',
+  'Spells 1034': 'Check Box 310', 'Spells 1035': 'Check Box 3020', 'Spells 1036': 'Check Box 3021',
+  'Spells 1037': 'Check Box 3022', 'Spells 1038': 'Check Box 3023', 'Spells 1039': 'Check Box 3024',
+  'Spells 1040': 'Check Box 3025', 'Spells 1041': 'Check Box 3026', 'Spells 1042': 'Check Box 3027',
+  'Spells 1043': 'Check Box 3028', 'Spells 1044': 'Check Box 3029', 'Spells 1045': 'Check Box 3030',
+  'Spells 1046': 'Check Box 313',
+  'Spells 1047': 'Check Box 314', 'Spells 1048': 'Check Box 315', 'Spells 1049': 'Check Box 3031',
+  'Spells 1050': 'Check Box 3032', 'Spells 1051': 'Check Box 3033', 'Spells 1052': 'Check Box 3034',
+  'Spells 1053': 'Check Box 3035', 'Spells 1054': 'Check Box 3036', 'Spells 1055': 'Check Box 3037',
+  'Spells 1056': 'Check Box 3038', 'Spells 1057': 'Check Box 3039', 'Spells 1058': 'Check Box 3040',
+  'Spells 1059': 'Check Box 3041',
+  'Spells 1060': 'Check Box 316', 'Spells 1061': 'Check Box 317', 'Spells 1062': 'Check Box 3042',
+  'Spells 1063': 'Check Box 3043', 'Spells 1064': 'Check Box 3044', 'Spells 1065': 'Check Box 3045',
+  'Spells 1066': 'Check Box 3046', 'Spells 1067': 'Check Box 3047', 'Spells 1068': 'Check Box 3048',
+  'Spells 1069': 'Check Box 3049', 'Spells 1070': 'Check Box 3050', 'Spells 1071': 'Check Box 3051',
+  'Spells 1072': 'Check Box 3052',
+  'Spells 1073': 'Check Box 318', 'Spells 1074': 'Check Box 319', 'Spells 1075': 'Check Box 3053',
+  'Spells 1076': 'Check Box 3054', 'Spells 1077': 'Check Box 3055', 'Spells 1078': 'Check Box 3056',
+  'Spells 1079': 'Check Box 3057', 'Spells 1080': 'Check Box 3058', 'Spells 1081': 'Check Box 3059',
+  'Spells 1082': 'Check Box 320', 'Spells 1083': 'Check Box 321', 'Spells 1084': 'Check Box 3060',
+  'Spells 1085': 'Check Box 3061', 'Spells 1086': 'Check Box 3062', 'Spells 1087': 'Check Box 3063',
+  'Spells 1088': 'Check Box 3064', 'Spells 1089': 'Check Box 3065', 'Spells 1090': 'Check Box 3066',
+  'Spells 1091': 'Check Box 322', 'Spells 1092': 'Check Box 323', 'Spells 1093': 'Check Box 3067',
+  'Spells 1094': 'Check Box 3068', 'Spells 1095': 'Check Box 3069', 'Spells 1096': 'Check Box 3070',
+  'Spells 1097': 'Check Box 3071', 'Spells 1098': 'Check Box 3072', 'Spells 1099': 'Check Box 3073',
+  'Spells 10100': 'Check Box 324', 'Spells 10101': 'Check Box 325', 'Spells 10102': 'Check Box 3074',
+  'Spells 10103': 'Check Box 3075', 'Spells 10104': 'Check Box 3076', 'Spells 10105': 'Check Box 3077',
+  'Spells 10106': 'Check Box 3078',
+  'Spells 10107': 'Check Box 326', 'Spells 10108': 'Check Box 327', 'Spells 10109': 'Check Box 3079',
+  'Spells 101010': 'Check Box 3080', 'Spells 101011': 'Check Box 3081', 'Spells 101012': 'Check Box 3082',
+  'Spells 101013': 'Check Box 3083',
+};
+
+/** Identity / combat / text fields (normalized names). */
+export const FIELDS = {
+  characterName: 'CharacterName',
+  classLevel: 'ClassLevel',
+  background: 'Background',
+  playerName: 'PlayerName',
+  race: 'Race',
+  alignment: 'Alignment',
+  xp: 'XP',
+  inspiration: 'Inspiration',
+  profBonus: 'ProfBonus',
+  ac: 'AC',
+  initiative: 'Initiative',
+  speed: 'Speed',
+  hpMax: 'HPMax',
+  hpCurrent: 'HPCurrent',
+  hpTemp: 'HPTemp',
+  hdTotal: 'HDTotal',
+  hd: 'HD',
+  passivePerception: 'Passive',
+  attacksText: 'AttacksSpellcasting',
+  proficienciesLang: 'ProficienciesLang',
+  personalityTraits: 'PersonalityTraits',
+  ideals: 'Ideals',
+  bonds: 'Bonds',
+  flaws: 'Flaws',
+  featuresAndTraits: 'Features and Traits',
+  equipment: 'Equipment',
+  cp: 'CP',
+  sp: 'SP',
+  ep: 'EP',
+  gp: 'GP',
+  pp: 'PP',
+  // Details page
+  age: 'Age',
+  height: 'Height',
+  weight: 'Weight',
+  eyes: 'Eyes',
+  skin: 'Skin',
+  hair: 'Hair',
+  allies: 'Allies',
+  factionName: 'FactionName',
+  backstory: 'Backstory',
+  additionalFeatures: 'Feat+Traits',
+  treasure: 'Treasure',
+  // Spellcasting page header
+  spellcastingClass: 'Spellcasting Class 2',
+  spellcastingAbility: 'SpellcastingAbility 2',
+  spellSaveDc: 'SpellSaveDC 2',
+  spellAtkBonus: 'SpellAtkBonus 2',
+} as const;

@@ -18,7 +18,7 @@ export default function Home() {
         </h1>
         
         <p className="text-xl md:text-2xl text-stone-400 max-w-2xl leading-relaxed font-light">
-          Breathe life into your campaigns. Drop your D&D Beyond JSON and instantly summon a Roll20-ready character sheet.
+          Breathe life into your campaigns. Drop your D&D Beyond PDF export and instantly summon a Roll20-ready character sheet.
         </p>
 
         <Dropzone />

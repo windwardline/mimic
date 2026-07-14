@@ -1,32 +1,47 @@
 import { NextResponse } from 'next/server';
-import { convertDDBtoRoll20 } from '@/lib/converter';
+import { convertPdfToRoll20 } from '@/lib/converter';
+import { PdfExtractionError } from '@/lib/pdf-extractor';
+
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
+    const formData = await req.formData();
+    const file = formData.get('file');
 
-    if (!data || !data.character) {
-      return NextResponse.json({ error: 'Invalid D&D Beyond JSON' }, { status: 400 });
+    if (!(file instanceof File)) {
+      return NextResponse.json(
+        { error: 'Upload a D&D Beyond character sheet PDF as the "file" form field.' },
+        { status: 400 }
+      );
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: 'PDF is too large (15 MB max).' }, { status: 413 });
     }
 
-    const charId = data.character.id || Date.now().toString();
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const roll20Json = await convertPdfToRoll20(bytes);
 
-    // Perform conversion
-    const roll20Json = convertDDBtoRoll20(data);
+    const slug =
+      roll20Json.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '') || 'character';
 
-    // Return the converted file as a downloadable attachment
     return new NextResponse(JSON.stringify(roll20Json, null, 2), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="roll20_${charId}.json"`
-      }
+        'Content-Disposition': `attachment; filename="roll20_${slug}.json"`,
+      },
     });
-
-  } catch (error: any) {
+  } catch (error) {
+    if (error instanceof PdfExtractionError) {
+      return NextResponse.json({ error: error.message }, { status: 422 });
+    }
     console.error('Conversion Error:', error);
     return NextResponse.json(
-      { error: 'Failed to convert character', details: error.message }, 
+      { error: 'Failed to convert character sheet.' },
       { status: 500 }
     );
   }
