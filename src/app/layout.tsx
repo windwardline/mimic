@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mimic.windwardline.com"),
   title: "Mimic | D&D Beyond to Roll20 Converter",
   description: "Instantly transform your D&D Beyond character sheets into Roll20-ready JSON files. Secure, frictionless, and totally free.",
   openGraph: {
