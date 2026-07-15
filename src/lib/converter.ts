@@ -3,7 +3,8 @@ import { parseCharacterSheet } from './sheet-parser';
 import { buildRoll20Character, Vttes1Character } from './roll20-builder';
 
 /**
- * Full pipeline: D&D Beyond PDF export (WotC form-fillable template) →
+ * Full pipeline: D&D Beyond "Export to PDF" file (character data stored as
+ * form-field widget annotations, without a usable AcroForm) →
  * VTTES schema_version 1 JSON, importable into Roll20 via the
  * VTT Enhancement Suite's "Import Character" journal button.
  */

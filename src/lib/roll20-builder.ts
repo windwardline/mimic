@@ -1,5 +1,5 @@
-import { ABILITIES } from './wotc-fields';
-import type { CharacterSheet } from './sheet-parser';
+import { ABILITIES } from './ddb-fields';
+import type { CharacterSheet, SpellEntry } from './sheet-parser';
 
 /**
  * VTT Enhancement Suite character import file, schema_version 1.
@@ -21,9 +21,9 @@ export interface Roll20Attrib {
   max: string | number;
 }
 
-/** Proficiency checkbox values used by the "D&D 5th Edition by Roll20" sheet. */
+/** Proficiency values used by the "D&D 5th Edition by Roll20" sheet. */
 const SAVE_PROF_VALUE = '(@{pb})';
-const SKILL_PROF_VALUE = '(@{pb}*@{athletics_type})';
+const skillProfValue = (skill: string) => `(@{pb}*@{${skill}_type})`;
 
 const ROW_ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -50,10 +50,44 @@ function buildBio(sheet: CharacterSheet): string {
   };
 
   add('Backstory', sheet.backstory);
-  add('Allies & Organizations', [sheet.factionName, sheet.allies].filter(Boolean).join('\n'));
-  add('Attacks & Spellcasting Notes', sheet.attacksText);
+  add('Appearance', sheet.appearanceDescription);
+  add(
+    'Details',
+    [
+      sheet.appearance.gender && `Gender: ${sheet.appearance.gender}`,
+      sheet.appearance.faith && `Faith: ${sheet.appearance.faith}`,
+      sheet.appearance.size && `Size: ${sheet.appearance.size}`,
+    ]
+      .filter(Boolean)
+      .join('\n')
+  );
+  add('Allies & Organizations', sheet.allies);
+  add('Defenses', [sheet.defenses, sheet.saveModifiers].filter(Boolean).join('\n'));
+  add('Senses', sheet.senses);
+  add('Actions', sheet.actionsText);
+  add('Attuned Magic Items', sheet.attunedItems.join('\n'));
+  add('Additional Notes', sheet.additionalNotes);
   if (sheet.playerName) add('Player', sheet.playerName);
   return sections.join('\n');
+}
+
+/** "1.5 lb." stack weight over 20 bolts → 0.075 per item (Roll20 multiplies by count). */
+function perItemWeight(weightRaw: string, qty: number | null): number | null {
+  const match = weightRaw.match(/\d+(?:\.\d+)?/);
+  if (!match) return null;
+  const total = parseFloat(match[0]);
+  if (qty && qty > 1) return Math.round((total / qty) * 1000) / 1000;
+  return total;
+}
+
+/** "WIS 19" → "Wisdom" for the sheet's save dropdown; attack rolls ("+9") → null. */
+const SAVE_ABILITY_NAMES: Record<string, string> = {
+  STR: 'Strength', DEX: 'Dexterity', CON: 'Constitution',
+  INT: 'Intelligence', WIS: 'Wisdom', CHA: 'Charisma',
+};
+function spellSaveAbility(saveHit: string): string | null {
+  const match = saveHit.trim().match(/^(STR|DEX|CON|INT|WIS|CHA)/i);
+  return match ? SAVE_ABILITY_NAMES[match[1].toUpperCase()] : null;
 }
 
 export function buildRoll20Character(
@@ -81,9 +115,8 @@ export function buildRoll20Character(
 
   for (const skill of sheet.skills) {
     set(`${skill.roll20}_bonus`, skill.bonus);
-    if (skill.proficient) {
-      set(`${skill.roll20}_prof`, SKILL_PROF_VALUE.replace('athletics', skill.roll20));
-    }
+    if (skill.proficient) set(`${skill.roll20}_prof`, skillProfValue(skill.roll20));
+    if (skill.expertise) set(`${skill.roll20}_type`, '2');
   }
 
   set('ac', sheet.ac);
@@ -96,17 +129,14 @@ export function buildRoll20Character(
   set('pb', sheet.profBonus);
   set('passive_wisdom', sheet.passivePerception);
 
-  const hitDiceCurrent = sheet.hitDice.match(/\d+/)?.[0] ?? '';
-  const hitDiceMax = sheet.hitDiceTotal.match(/\d+/)?.[0] ?? '';
-  if (hitDiceCurrent || hitDiceMax) {
+  if (sheet.hitDice.total !== null) {
     attribs.push({
       name: 'hit_dice',
-      current: hitDiceCurrent || hitDiceMax,
-      max: hitDiceMax || hitDiceCurrent,
+      current: String(sheet.hitDice.remaining ?? sheet.hitDice.total),
+      max: String(sheet.hitDice.total),
     });
   }
-  const hitDieType = sheet.hitDiceTotal.match(/d\d+/i)?.[0] ?? sheet.hitDice.match(/d\d+/i)?.[0];
-  if (hitDieType) set('hitdietype', hitDieType.toLowerCase());
+  if (sheet.hitDice.dieType) set('hitdietype', sheet.hitDice.dieType);
 
   for (let i = 0; i < sheet.deathSaveSuccesses && i < 3; i++) set(`deathsave_succ${i + 1}`, 'on');
   for (let i = 0; i < sheet.deathSaveFailures && i < 3; i++) set(`deathsave_fail${i + 1}`, 'on');
@@ -135,19 +165,25 @@ export function buildRoll20Character(
   set('bonds', sheet.bonds);
   set('flaws', sheet.flaws);
 
-  // "simple" mode swaps the compendium-driven repeating sections for plain
-  // textareas, which is the only faithful representation of the PDF's
-  // free-text feature/equipment blocks.
+  // "simple" mode swaps the compendium-driven traits section for a plain
+  // textarea, which is the only faithful representation of the PDF's
+  // free-text feature blocks.
   if (sheet.featuresAndTraits) {
     set('simpletraits', 'simple');
     set('features_and_traits', sheet.featuresAndTraits);
   }
-  if (sheet.equipment) {
-    set('simpleinventory', 'simple');
-    set('equipment', sheet.equipment);
+
+  const attuned = new Set(sheet.attunedItems.map((name) => name.toLowerCase()));
+  for (const item of sheet.equipmentItems) {
+    const prefix = `repeating_inventory_${rowId()}`;
+    set(`${prefix}_itemname`, item.name);
+    set(`${prefix}_itemcount`, item.qty ?? 1);
+    const weight = perItemWeight(item.weight, item.qty);
+    if (weight !== null) set(`${prefix}_itemweight`, weight);
+    if (attuned.has(item.name.toLowerCase())) set(`${prefix}_itemmodifiers`, 'Attuned');
   }
-  set('additional_feature_and_traits', sheet.additionalFeatures);
-  set('treasure', sheet.treasure);
+
+  set('additional_feature_and_traits', sheet.additionalNotes);
 
   set('age', sheet.appearance.age);
   set('height', sheet.appearance.height);
@@ -163,13 +199,14 @@ export function buildRoll20Character(
     const prefix = `repeating_attack_${id}`;
     set(`${prefix}_atkname`, weapon.name);
     set(`${prefix}_atkbonus`, weapon.atkBonus);
-    const damageMatch = weapon.damage.match(/^\s*(\d*d\d+(?:\s*[+-]\s*\d+)?)\s*(.*)$/i);
+    const damageMatch = weapon.damage.match(/^\s*(\d*d\d+(?:\s*[+-]\s*\d+)?|\d+)\s*(.*)$/i);
     if (damageMatch) {
       set(`${prefix}_dmgbase`, damageMatch[1].replace(/\s+/g, ''));
       if (damageMatch[2]) set(`${prefix}_dmgtype`, damageMatch[2].trim());
-    } else {
+    } else if (weapon.damage) {
       set(`${prefix}_dmgbase`, weapon.damage);
     }
+    if (weapon.notes) set(`${prefix}_atk_desc`, weapon.notes);
     set(`${prefix}_atkflag`, '{{attack=1}}');
     set(`${prefix}_dmgflag`, '{{damage=1}} {{dmg1flag=1}}');
   }
@@ -182,15 +219,12 @@ export function buildRoll20Character(
 
   for (const slot of sheet.spellSlots) {
     set(`lvl${slot.level}_slots_total`, slot.total);
-    set(`lvl${slot.level}_slots_expended`, slot.remaining ?? slot.total);
+    // The PDF does not carry expended slots; import with everything available.
+    set(`lvl${slot.level}_slots_expended`, slot.total);
   }
 
   for (const spell of sheet.spells) {
-    const prefix = `repeating_spell-${spell.level}_${rowId()}`;
-    set(`${prefix}_spellname`, spell.name);
-    set(`${prefix}_spelllevel`, spell.level);
-    if (spell.prepared) set(`${prefix}_spellprepared`, '1');
-    if (sheet.spellcastingClass) set(`${prefix}_spellclass`, sheet.spellcastingClass);
+    addSpell(sheet, spell, `repeating_spell-${spell.level}_${rowId()}`, set);
   }
 
   return {
@@ -200,4 +234,38 @@ export function buildRoll20Character(
     bio: buildBio(sheet),
     attribs,
   };
+}
+
+function addSpell(
+  sheet: CharacterSheet,
+  spell: SpellEntry,
+  prefix: string,
+  set: (name: string, current: string | number | null, max?: string | number) => void
+): void {
+  set(`${prefix}_spellname`, spell.name);
+  set(`${prefix}_spelllevel`, spell.level);
+  if (spell.prepared) set(`${prefix}_spellprepared`, '1');
+  set(`${prefix}_spellclass`, spell.source || sheet.spellcastingClass);
+  set(`${prefix}_spellcastingtime`, spell.castingTime);
+  set(`${prefix}_spellrange`, spell.range);
+  set(`${prefix}_spellduration`, spell.duration);
+  if (/^concentration/i.test(spell.duration)) {
+    set(`${prefix}_spellconcentration`, '{{concentration=1}}');
+  }
+  if (spell.ritual) set(`${prefix}_spellritual`, '{{ritual=1}}');
+
+  if (spell.components) {
+    const comps = spell.components.toUpperCase();
+    set(`${prefix}_spellcomp_v`, comps.includes('V') ? '{{v=1}}' : '0');
+    set(`${prefix}_spellcomp_s`, comps.includes('S') ? '{{s=1}}' : '0');
+    set(`${prefix}_spellcomp_m`, comps.includes('M') ? '{{m=1}}' : '0');
+  }
+
+  const saveAbility = spellSaveAbility(spell.saveHit);
+  if (saveAbility) set(`${prefix}_spellsave`, saveAbility);
+
+  const description = [spell.notes, spell.pageRef && `Source: ${spell.pageRef}`]
+    .filter(Boolean)
+    .join('\n');
+  set(`${prefix}_spelldescription`, description);
 }
