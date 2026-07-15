@@ -32,6 +32,11 @@ interface TextPage {
 }
 
 async function readTextPages(bytes: Uint8Array): Promise<TextPage[]> {
+  // Import the worker module explicitly: it registers itself on
+  // globalThis.pdfjsWorker, so pdf.js skips its runtime worker lookup — which
+  // uses a computed path that serverless file-tracing cannot see (the
+  // deployed function would otherwise lack pdf.worker.mjs entirely).
+  await import('pdfjs-dist/legacy/build/pdf.worker.mjs');
   const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
   // pdf.js mutates/transfers the buffer it is given — hand it a copy.
   const doc = await getDocument({
