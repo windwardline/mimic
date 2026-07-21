@@ -34,6 +34,8 @@ npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
 
+CI runs all four on every push and pull request to `main`.
+
 The test suite builds a synthetic PDF that reproduces the real exports' structure: widget annotations with no AcroForm, duplicated spell-page field names, trailing-space field name quirks, and PDFsharp's newline-wrapped hex strings. To also test against a real export (not committed — it's someone's character), run:
 
 ```bash
