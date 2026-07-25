@@ -41,5 +41,7 @@ yarn-error.log*
 next-env.d.ts
 gcs-key.json
 
-# claude code local config
+# local agent config
 .claude/
+CLAUDE.md
+AGENTS.md
