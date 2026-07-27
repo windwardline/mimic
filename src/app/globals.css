@@ -1,70 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  /* torchlight — the default. Daylight is parchment. */
-  --ground: #050505;
-  --ink-soft: #a8a29e;
-  --ink-faint: #78716c;
-  --ink-dim: #9ca3af;
-  --ink-dimmer: #d1d5db;
-  --h3: #ffffff;
-  --wash: rgba(255, 255, 255, 0.1);
-  --wash-soft: rgba(255, 255, 255, 0.05);
-  --panel-line: rgba(255, 255, 255, 0.2);
-  --badge-ink: rgba(253, 230, 138, 0.9);
-  --accent-ink: #fcd34d;
-  --ok-ink: #34d399;
-  --err-ink: #f87171;
-  --err-bg: rgba(69, 10, 10, 0.4);
-  --title-from: #fef3c7;
-  --title-via: #fbbf24;
-  --title-to: #dc2626;
-  --glow-opacity: 0.4;
-  --background: var(--ground);
-  --foreground: var(--ink-soft);
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --ground: #f5efe2;
-    --ink-soft: #57534e;
-    --ink-faint: #6d675f;
-    --ink-dim: #57534e;
-    --ink-dimmer: #44403c;
-    --h3: #292524;
-    --wash: rgba(41, 37, 36, 0.07);
-    --wash-soft: rgba(41, 37, 36, 0.04);
-    --panel-line: rgba(41, 37, 36, 0.25);
-    --badge-ink: #92400e;
-    --accent-ink: #b45309;
-    --ok-ink: #047857;
-    --err-ink: #b91c1c;
-    --err-bg: rgba(153, 27, 27, 0.08);
-    --title-from: #b45309;
-    --title-via: #c2410c;
-    --title-to: #991b1b;
-    --glow-opacity: 0.22;
-  }
-}
-:root[data-theme='light'] {
-  --ground: #f5efe2;
-  --ink-soft: #57534e;
-  --ink-faint: #6d675f;
-  --ink-dim: #57534e;
-  --ink-dimmer: #44403c;
-  --h3: #292524;
-  --wash: rgba(41, 37, 36, 0.07);
-  --wash-soft: rgba(41, 37, 36, 0.04);
-  --panel-line: rgba(41, 37, 36, 0.25);
-  --badge-ink: #92400e;
-  --accent-ink: #b45309;
-  --ok-ink: #047857;
-  --err-ink: #b91c1c;
-  --err-bg: rgba(153, 27, 27, 0.08);
-  --title-from: #b45309;
-  --title-via: #c2410c;
-  --title-to: #991b1b;
-  --glow-opacity: 0.22;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme inline {
@@ -74,19 +12,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* the lamp — Daylight / Torchlight / System */
-.lamp { position: absolute; top: 18px; right: 20px; z-index: 30; display: flex; gap: 2px; }
-.lamp-opt {
-  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700;
-  background: none; border: 0; cursor: pointer; padding: 8px 7px;
-  color: var(--ink-faint);
-}
-.lamp-opt:hover { color: var(--ink-dimmer); }
-.lamp-opt:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
-.lamp-opt[aria-pressed='true'] { color: var(--accent-ink); }

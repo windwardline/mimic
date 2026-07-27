@@ -75,28 +75,28 @@ export default function Dropzone() {
           rounded-3xl border-2 border-dashed
           transition-all duration-300 ease-in-out
           flex flex-col items-center justify-center gap-6 cursor-pointer
-          backdrop-blur-xl bg-(--wash-soft)
-          ${isDragActive ? 'border-amber-500 bg-amber-500/10 scale-105 shadow-[0_0_40px_rgba(245,158,11,0.2)]' : 'border-(--panel-line) hover:border-amber-500/40 hover:bg-(--wash)'}
+          backdrop-blur-xl bg-white/5
+          ${isDragActive ? 'border-amber-500 bg-amber-500/10 scale-105 shadow-[0_0_40px_rgba(245,158,11,0.2)]' : 'border-white/20 hover:border-amber-500/40 hover:bg-white/10'}
           ${isProcessing ? 'animate-pulse' : ''}
         `}
       >
         <input {...getInputProps()} />
 
-        <div className="p-4 rounded-full bg-(--wash) shadow-inner">
+        <div className="p-4 rounded-full bg-white/10 shadow-inner">
           {isDone ? (
-            <CheckCircle className="w-12 h-12 text-(--ok-ink)" />
+            <CheckCircle className="w-12 h-12 text-emerald-400" />
           ) : isDragActive ? (
             <UploadCloud className="w-12 h-12 text-amber-400" />
           ) : (
-            <FileText className="w-12 h-12 text-(--ink-dimmer) group-hover:text-amber-300 transition-colors" />
+            <FileText className="w-12 h-12 text-gray-300 group-hover:text-amber-300 transition-colors" />
           )}
         </div>
 
         <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold text-(--h3) tracking-tight">
+          <h3 className="text-2xl font-bold text-white tracking-tight">
             {isDone ? 'Conversion Complete!' : isDragActive ? 'Drop to convert' : 'Upload Character PDF'}
           </h3>
-          <p className="text-(--ink-dim) font-medium">
+          <p className="text-gray-400 font-medium">
             {isDone
               ? 'Your Roll20 file is downloading...'
               : isDragActive
@@ -110,7 +110,7 @@ export default function Dropzone() {
       </div>
 
       {error && (
-        <p className="mt-4 text-sm text-(--err-ink) bg-(--err-bg) border border-red-500/20 rounded-xl px-4 py-3">
+        <p className="mt-4 text-sm text-red-400 bg-red-950/40 border border-red-500/20 rounded-xl px-4 py-3">
           {error}
         </p>
       )}
