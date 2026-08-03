@@ -2,6 +2,8 @@
 
 Live: **[mimic.windwardline.com](https://mimic.windwardline.com)**
 
+![Mimic: drop a D&D Beyond PDF export, summon a Roll20-ready character sheet](docs/readme-hero.png)
+
 Convert **D&D Beyond character sheet PDF exports** into JSON files you can import into **Roll20**.
 
 D&D Beyond's "Export to PDF" (PDFsharp-generated) stores every value as a form-field *widget annotation* on the page — but without a usable AcroForm catalog entry, so ordinary form APIs see an empty document. Mimic walks the page annotations directly, reads the raw field values — no OCR, no scraping — and rebuilds the character as a [VTT Enhancement Suite](https://justas-d.github.io/roll20-enhancement-suite/) (`schema_version: 1`) JSON file targeting the **D&D 5th Edition by Roll20** character sheet.
