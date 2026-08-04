@@ -12,7 +12,7 @@ Next.js ^16.2.12 + React 19.2.8 (exact), pdf-lib + pdfjs-dist, Tailwind v4, vite
 
 ## Gates — CI in order
 
-`npm ci` → lint → typecheck → test → build. Push to main deploys production. A parallel `security.yml` (PRs, pushes, weekly cron) gates Semgrep, secret scan, and dependency scan; a post-deploy job asserts the production security headers. An advisory Claude review runs on every PR (`claude-review.yml`, activating once the `ANTHROPIC_API_KEY` repo secret exists).
+`npm ci` → lint → typecheck → test → build. Push to main deploys production. A parallel `security.yml` (PRs, pushes, weekly cron) gates Semgrep, secret scan, and dependency scan; a post-deploy job asserts the production security headers. An advisory Claude review runs on every same-repo PR via `claude-review.yml`, which deliberately calls the fleet reusable at `@main` — one merge updates every repo. It activates only when the `ANTHROPIC_API_KEY` secret is present; fork PRs never receive secrets, so they skip it by security design.
 
 ## Laws
 
