@@ -41,7 +41,7 @@ export default function Dropzone() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = response.headers.get('Content-Disposition')?.split('filename="')[1]?.replace('"', '') || 'roll20_character.json';
+      a.download = response.headers.get('Content-Disposition')?.split('filename="')[1]?.replace(/"/g, '') || 'roll20_character.json';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
