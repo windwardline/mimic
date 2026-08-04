@@ -21,4 +21,4 @@ Next.js ^16.2.12 + React 19.2.8 (exact), pdf-lib + pdfjs-dist, Tailwind v4, vite
 - Tests are colocated in `src/lib/*.test.ts` on vitest defaults (node environment, no config file). Fixtures in `src/lib/testing/` synthesize real-export quirks: widget annotations with no AcroForm, duplicated spell-page field names, trailing-space names, PDFsharp newline-wrapped hex strings.
 - `real-export.test.ts` is opt-in: `DDB_EXPORT_PDF=/path/to/export.pdf npm test`. No real export is committed — keep it that way.
 - Checkbox state (death saves, inspiration) is unrecoverable from flattened PDFs. Expected behavior, not a bug.
-- No `vercel.json` exists — this app currently ships no CSP or security headers. Known gap; closing it means adding `vercel.json`, not `next.config.ts` meta tags.
+- Security headers are platform-applied from `vercel.json` — the house seven-header set, CSP on craft's Next.js shape. PDF parsing is server-side, so the CSP carries no worker or blob allowances; `src/lib/security-headers.test.ts` enforces the set and those absences. After a deploy, verify live: `curl -sI https://mimic.windwardline.com`.
