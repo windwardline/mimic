@@ -26,6 +26,10 @@ declare module 'pdfjs-dist/legacy/build/pdf.mjs' {
   export interface PdfJsDocument {
     numPages: number;
     getPage(pageNumber: number): Promise<PdfJsPage>;
+  }
+
+  export interface PdfJsLoadingTask {
+    promise: Promise<PdfJsDocument>;
     destroy(): Promise<void>;
   }
 
@@ -34,5 +38,5 @@ declare module 'pdfjs-dist/legacy/build/pdf.mjs' {
     isEvalSupported?: boolean;
     verbosity?: number;
     useSystemFonts?: boolean;
-  }): { promise: Promise<PdfJsDocument> };
+  }): PdfJsLoadingTask;
 }
