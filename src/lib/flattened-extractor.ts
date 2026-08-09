@@ -39,14 +39,15 @@ async function readTextPages(bytes: Uint8Array): Promise<TextPage[]> {
   await import('pdfjs-dist/legacy/build/pdf.worker.mjs');
   const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
   // pdf.js mutates/transfers the buffer it is given — hand it a copy.
-  const doc = await getDocument({
+  const task = getDocument({
     data: bytes.slice(),
     isEvalSupported: false,
     verbosity: 0,
     useSystemFonts: true,
-  }).promise;
+  });
   const pages: TextPage[] = [];
   try {
+    const doc = await task.promise;
     for (let p = 1; p <= doc.numPages; p++) {
       const page = await doc.getPage(p);
       const content = await page.getTextContent();
@@ -63,7 +64,9 @@ async function readTextPages(bytes: Uint8Array): Promise<TextPage[]> {
       pages.push({ index: p - 1, items });
     }
   } finally {
-    await doc.destroy();
+    // v6 removed PDFDocumentProxy.destroy(); the loading task is the single
+    // teardown point (worker + transport), and it is safe on a failed load.
+    await task.destroy();
   }
   return pages;
 }
