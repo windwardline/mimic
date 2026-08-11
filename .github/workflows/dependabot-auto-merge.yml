@@ -1,0 +1,55 @@
+name: Dependabot auto-merge
+
+# Green patch and minor Dependabot updates land without a human. Majors never
+# do — they are deferred deliberately and tracked in each repo's "Deferred
+# major dependency migrations" issue.
+#
+# What makes this safe is already in place and is not this file's doing: every
+# update lane in .github/dependabot.yml carries `cooldown: default-days: 7`, so
+# a release must sit on the registry a week before Dependabot will even open a
+# PR. Security updates are exempt from cooldown by design — GitHub enforces that
+# exemption in dependabot-core, not merely in docs — and they still gate on the
+# same required checks as everything else. `--auto` means GitHub merges only
+# when those checks are green; it never bypasses a gate.
+#
+# `on: pull_request`, never `pull_request_target`. GitHub has honored the
+# permissions key on Dependabot-triggered pull_request runs since 2021-10-11,
+# so pull_request_target buys nothing here — for a Dependabot base ref the token
+# stays read-only and secrets stay unavailable even on re-run by another actor —
+# while handing a write token to a run whose input is a mutated dependency
+# manifest, which is the classic supply-chain foothold.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot-auto-merge:
+    name: dependabot-auto-merge
+    # The PR author, not github.actor: a manual re-run flips the actor to a
+    # human, while the author cannot be changed. The head-repo comparison keeps
+    # forks out without naming this repo, which is what lets the file stay
+    # byte-identical across the fleet.
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read the update metadata
+        id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Queue the merge behind the required checks
+        if: >-
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --squash --auto --delete-branch "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
