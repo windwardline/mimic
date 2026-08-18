@@ -39,7 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-gcs-key.json
 
 # local agent config (the tracked AGENTS.md/CLAUDE.md operating contract is not local config)
 .claude/
