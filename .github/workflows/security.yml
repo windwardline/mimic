@@ -82,7 +82,7 @@ jobs:
       - name: Assert the seven security headers on production
         run: |
           sleep 60
-          for attempt in 1 2 3 4 5 6; do
+          for _attempt in 1 2 3 4 5 6; do
             missing=""
             h=$(curl -sI --max-time 20 https://mimic.windwardline.com/)
             for want in content-security-policy strict-transport-security x-content-type-options referrer-policy x-frame-options permissions-policy cross-origin-opener-policy; do
