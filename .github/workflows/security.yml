@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "17 9 * * 1"   # weekly: Semgrep, CodeQL, Secret scan, License policy
+    - cron: "17 9 * * 1"   # weekly: Semgrep, Secret scan, Dependency scan + Headers live
     - cron: "17 13 * * *"  # daily: Dependency scan + Headers live
   workflow_dispatch:
 
