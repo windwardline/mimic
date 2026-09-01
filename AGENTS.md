@@ -28,3 +28,19 @@ Dependabot groups npm production dependencies as `production-dependencies`, npm 
 - `real-export.test.ts` is opt-in: `DDB_EXPORT_PDF=/path/to/export.pdf npm test`. No real export is committed — keep it that way.
 - Checkbox state (death saves, inspiration) is unrecoverable from flattened PDFs. Expected behavior, not a bug.
 - Security headers are platform-applied from `vercel.json` — the house seven-header set, CSP on craft's Next.js shape. PDF parsing is server-side, so the CSP carries no worker or blob allowances; `src/lib/security-headers.test.ts` enforces the set and those absences. After a deploy, verify live: `curl -sI https://mimic.windwardline.com`.
+
+## Declared gates
+
+The machine-readable gate set. `scripts/fleet-conformance.sh` requires this block
+and the workspace done-gate hook runs every `gate:` line before a session may
+finish, so what runs is what is written here rather than what a hook guessed from
+`package.json`. Each key states its own boundary: `gate:` runs at session end and
+must be local and quick; `release:` runs before a pull request and may be slow;
+`cadence:` is scheduled or needs the live machine and is run by neither.
+
+```fleet-gates
+gate: npm run lint
+gate: npm run typecheck
+gate: npm test
+gate: npm run build
+```
