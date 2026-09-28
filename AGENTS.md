@@ -27,6 +27,7 @@ Dependabot groups npm production dependencies as `production-dependencies`, npm 
 - Tests are colocated in `src/lib/*.test.ts` on vitest defaults (node environment, no config file). Fixtures in `src/lib/testing/` synthesize real-export quirks: widget annotations with no AcroForm, duplicated spell-page field names, trailing-space names, PDFsharp newline-wrapped hex strings.
 - `real-export.test.ts` is opt-in: `DDB_EXPORT_PDF=/path/to/export.pdf npm test`. No real export is committed — keep it that way.
 - Checkbox state (death saves, inspiration) is unrecoverable from flattened PDFs. Expected behavior, not a bug.
+- Served images carry the bytes their extension names. Next.js and Vercel set the content type from the extension and `vercel.json` sends `nosniff`, so a mismatch is served with the wrong type; `src/lib/image-types.test.ts` checks every metadata image in `src/app` and every image in `public/`.
 - Security headers are platform-applied from `vercel.json` — the house seven-header set, CSP on craft's Next.js shape. PDF parsing is server-side, so the CSP carries no worker or blob allowances; `src/lib/security-headers.test.ts` enforces the set and those absences. After a deploy, verify live: `curl -sI https://mimic.windwardline.com`.
 
 ## Declared gates
