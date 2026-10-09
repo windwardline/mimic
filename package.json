@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide-react": "^1.47.0",
+    "lucide-react": "^1.49.0",
     "next": "^16.3.8",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289",
@@ -38,6 +38,6 @@
     "eslint-config-next": "^16.3.8",
     "tailwindcss": "^4",
     "typescript": "^6",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.3"
   }
 }
