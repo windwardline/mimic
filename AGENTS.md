@@ -4,7 +4,7 @@ Operating contract for AI work in this repo; the global `~/AGENTS.md` still appl
 
 ## Stack — do not substitute without flagging
 
-Next.js ^16.2.12 + React 19.2.8 (exact), pdf-lib + pdfjs-dist, Tailwind v4, vitest. The security `overrides` in `package.json` (postcss, minimatch, sharp) stay until upstream catches up.
+Next.js ^16.3.8 + React 19.3.0 (exact), pdf-lib + pdfjs-dist, Tailwind v4, vitest. The security `overrides` in `package.json` (postcss, minimatch, sharp, nanoid, js-yaml) stay until upstream catches up; unfixable advisories are accepted with an expiry in `osv-scanner.toml`.
 
 ## Commands
 
