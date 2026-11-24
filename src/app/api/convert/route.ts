@@ -1,19 +1,25 @@
 import { NextResponse } from 'next/server';
-import { convertPdfToRoll20 } from '@/lib/converter';
-import { PdfExtractionError } from '@/lib/pdf-extractor';
+import { convertPdfToRoll20 } from '../../../lib/converter';
+import { PdfExtractionError } from '../../../lib/pdf-extractor';
 
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 
+const USAGE_ERROR = 'Upload a D&D Beyond character sheet PDF as the "file" form field.';
+
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
+    // A body that is not multipart form data makes formData() throw. That is
+    // the caller's mistake, so it answers 400, not the 500 kept for ours.
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch {
+      return NextResponse.json({ error: USAGE_ERROR }, { status: 400 });
+    }
     const file = formData.get('file');
 
     if (!(file instanceof File)) {
-      return NextResponse.json(
-        { error: 'Upload a D&D Beyond character sheet PDF as the "file" form field.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: USAGE_ERROR }, { status: 400 });
     }
     if (file.size > MAX_UPLOAD_BYTES) {
       return NextResponse.json({ error: 'PDF is too large (15 MB max).' }, { status: 413 });
